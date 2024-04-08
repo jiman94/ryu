@@ -1,0 +1,43 @@
+name: Maven CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  JAVA_VERSION: 21
+  MAVEN_VERSION: '3.8'  # Adjust if you want a different Maven version
+  CACHE_KEY: maven-local-repo
+  MAVEN_TASKS: clean test  # Define your Maven tasks here
+
+jobs:
+  build:
+    name: 'Build & Test'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'maven'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.m2/repository
+          key: ${{ env.CACHE_KEY }}-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ env.CACHE_KEY }}-${{ runner.os }}-
+
+      - name: Maven Build
+        run: mvn ${{ env.MAVEN_TASKS }}

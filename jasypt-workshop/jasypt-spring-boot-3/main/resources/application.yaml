@@ -1,0 +1,7 @@
+jasypt:
+  encryptor:
+    password: javatechie # shouldn't be hard-coded
+
+database:
+  username: user
+  password: ENC(H8gNoEhLfmDNQIfWEyZaEDLs/pykS6+AqpcGpq2OyehB9+g97Oh7zIzetCUApcBR)

@@ -1,0 +1,10 @@
+CREATE USER 'msa'@'localhost' IDENTIFIED BY 'msa';
+CREATE USER 'msa'@'%' IDENTIFIED BY 'msa';
+
+GRANT ALL PRIVILEGES ON *.* TO 'msa'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'msa'@'%';
+
+FLUSH PRIVILEGES;
+
+CREATE DATABASE `order` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE `inventory` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

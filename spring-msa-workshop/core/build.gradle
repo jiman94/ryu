@@ -1,0 +1,29 @@
+bootJar { enabled = false }
+jar { enabled = true }
+buildscript {
+    ext {
+        awsBomVersion = "2.17.138"
+    }
+}
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-validation')
+    implementation('org.springframework:spring-tx')
+    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation('org.apache.commons:commons-lang3:3.12.0')
+    implementation('io.lettuce:lettuce-core:6.1.5.RELEASE')
+    implementation('org.apache.commons:commons-pool2:2.11.1')
+    implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation "org.springframework.cloud:spring-cloud-starter-bootstrap"
+
+//    compile group: 'io.jsonwebtoken', name: 'jjwt-api', version: "${jwtVersion}"
+
+    implementation platform("software.amazon.awssdk:bom:${awsBomVersion}")
+    implementation "software.amazon.awssdk:sdk-core"
+    implementation("com.querydsl:querydsl-core:5.0.0")
+
+    runtimeOnly 'com.h2database:h2'
+}

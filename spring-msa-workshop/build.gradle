@@ -1,0 +1,221 @@
+buildscript {
+    ext {
+        springBootVersion = '3.1.3'
+        lombokVersion = '1.18.22'
+        h2Version = '2.2.220'
+        mariadbJavaClientVersion = "3.1.4"
+        httpClientVersion = '4.5.8'
+        flywayVersion = '9.19.0'
+        jacksonVersion = '2.15.2'
+        springCloudVersion = '2022.0.4'
+        queryDslVersion = '5.0.0'
+        gsonVersion = '2.8.9'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+    }
+}
+
+plugins {
+    id 'java'
+    id "com.diffplug.spotless" version "6.0.1"
+    id "org.flywaydb.flyway" version "${flywayVersion}"
+}
+
+allprojects {
+    apply plugin: "com.diffplug.spotless"
+    apply from: rootProject.file('gradle/install-git-hooks.gradle')
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'eclipse'
+    apply plugin: 'groovy'
+    apply plugin: 'idea'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    group = 'com.msa.template'
+    version = '0.0.1-SNAPSHOT'
+    sourceCompatibility = 17
+    targetCompatibility = 17
+    compileJava.options.encoding = 'UTF-8'
+
+    dependencyManagement {
+        imports {
+            mavenBom("com.fasterxml.jackson:jackson-bom:${jacksonVersion}")
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    task initSourceFolders {
+        sourceSets*.java.srcDirs*.each {
+            if (!it.exists()) {
+                it.mkdirs()
+            }
+        }
+        sourceSets*.resources.srcDirs*.each {
+            if (!it.exists()) {
+                it.mkdirs()
+            }
+        }
+    }
+
+    dependencies {
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+        testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+        testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+        implementation("com.google.guava:guava:29.0-jre")
+        runtimeOnly 'com.h2database:h2'
+
+        // test
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation('nl.jqno.equalsverifier:equalsverifier:3.1.12')
+        testImplementation "org.apache.httpcomponents:httpclient:${httpClientVersion}"
+    }
+
+    if (project.name.startsWithAny('core')) {
+        //not executable
+        bootJar { enabled = false }
+        jar { enabled = true }
+    } else {
+        //executable
+        bootJar {
+            enabled = true
+            archiveFileName = 'application.jar'
+        }
+        jar { enabled = false }
+    }
+    test {
+        useJUnitPlatform()
+    }
+}
+
+def applicationProjects = [
+        project(':order-service'),
+        project(':inventory-service')
+]
+
+configure(applicationProjects) {
+    buildscript {
+        ext {
+            generatedSourcesDir = "src/main/generated"
+        }
+    }
+
+    dependencies {
+        implementation project(':core')
+
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation "org.springframework.boot:spring-boot-starter-security"
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+        implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+        implementation 'org.jsoup:jsoup:1.16.1'
+        implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+        implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.0.1'
+
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-cache'
+        implementation("org.mariadb.jdbc:mariadb-java-client:${mariadbJavaClientVersion}")
+
+        implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
+        implementation group: 'org.hibernate.orm', name: 'hibernate-envers', version: '6.3.0.Final'
+        implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.0.2'
+        implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '8.0.0.Final'
+
+        // querydsl
+        implementation("com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta")
+        implementation("com.querydsl:querydsl-core:${queryDslVersion}")
+        annotationProcessor("com.querydsl:querydsl-apt:${queryDslVersion}:jakarta")
+        annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+        annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+
+        // json path
+        implementation 'com.jayway.jsonpath:json-path:2.6.0'
+        implementation 'commons-validator:commons-validator:1.7'
+
+        implementation('com.fasterxml.jackson.datatype:jackson-datatype-hibernate5')
+        implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+        implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+        implementation 'org.slf4j:slf4j-api'
+        implementation 'com.google.guava:guava:23.0'
+        implementation 'org.apache.commons:commons-lang3'
+        implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+
+        // openapi
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+        // otel-mdc
+        implementation("io.opentelemetry.instrumentation:opentelemetry-logback-mdc-1.0:1.33.0-alpha")
+
+        // openfeign
+        implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
+        implementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
+    }
+
+    // querydsl
+    sourceSets {
+        main.java.srcDirs += [generatedSourcesDir]
+    }
+    compileJava.with {
+        it.options.annotationProcessorGeneratedSourcesDirectory file(generatedSourcesDir)
+    }
+    clean.doLast {
+        file(generatedSourcesDir).deleteDir()
+    }
+}
+
+def integrationTestProjects = [
+        project(':order-service'),
+        project(':inventory-service')
+]
+configure(integrationTestProjects) {
+
+    sourceSets {
+        integrationTest {
+            java {
+                compileClasspath += main.output + test.output
+                runtimeClasspath += main.output + test.output
+                srcDir file('src/integration-test/java')
+            }
+            resources.srcDir file('src/integration-test/resources')
+            resources.srcDir file('src/webapp')
+        }
+    }
+    configurations {
+        integrationTestCompile.extendsFrom testCompile
+        integrationTestRuntime.extendsFrom testRuntime
+        integrationTestImplementation.extendsFrom testImplementation
+    }
+
+    task integrationTest(type: Test) {
+        afterTest { desc, result ->
+            logger.quiet "Executing integration test ${desc.name} [${desc.className}] with result: ${result.resultType}"
+        }
+        testClassesDirs = sourceSets.integrationTest.output.classesDirs
+        classpath = sourceSets.integrationTest.runtimeClasspath
+        outputs.upToDateWhen { false }
+    }
+    integrationTest {
+        useJUnitPlatform()
+    }
+}
+

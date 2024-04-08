@@ -1,0 +1,80 @@
+server:
+  port: 9000
+  servlet.session.timeout: 30m
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, refresh
+
+spring:
+  application:
+    name: order
+  web:
+    resources:
+      add-mappings: false
+  servlet:
+    multipart:
+      maxFileSize: 100MB
+      maxRequestSize: 100MB
+  session.jdbc.initialize-schema: never
+  mvc:
+    throw-exception-if-no-handler-found: true
+  thymeleaf:
+    cache: false
+  jackson.date-format: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+  main:
+    allow-bean-definition-overriding: true
+  flyway:
+    enabled: false
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+#      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          batch_size: 500
+          fetch_size: 500
+          batch_versioned_data: true
+  datasource:
+    write:
+      jdbcUrl: jdbc:mariadb://localhost:13306/order
+      driver-class-name: org.mariadb.jdbc.Driver
+      username: msa
+      password: msa
+      maximum-pool-size: 5
+      idle-timeout: 0
+      max-lifetime: 55000
+      pool-name: pool-write
+    read:
+      jdbcUrl: jdbc:mariadb://localhost:13306/order
+      driver-class-name: org.mariadb.jdbc.Driver
+      username: msa
+      password: msa
+      maximum-pool-size: 5
+      idle-timeout: 0
+      max-lifetime: 55000
+      pool-name: pool-read
+      readOnly: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+inventory:
+  url: http://localhost:9001

@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: local
+    group:
+      local:
+        - inventory-local
+        - core-local
+      develop:
+        - inventory-develop
+        - core-develop
+      test:
+        - inventory-test
+        - core-test        -
+    include:
+      - inventory
+      - core

@@ -1,0 +1,19 @@
+{
+  "name": "bff-template",
+  "version": "1.0.0",
+  "description": "A unified package.json for managing multiple projects",
+  "scripts": {
+    "install:all": "npm run install:backend && npm run install:bff && npm run install:nextjs",
+    "install:backend": "cd backend-inventory && npm install && cd ../backend-order && npm install",
+    "install:bff": "cd bff-mobile && npm install --force && cd ../bff-web && npm install --force",
+    "install:nextjs": "cd nextjs-mobile && npm install && cd ../nextjs-web && npm install",
+    "start:backend-inventory": "cd backend-inventory && node server.js",
+    "start:backend-order": "cd backend-order && node server.js",
+    "start:bff-mobile": "cd bff-mobile && npm run start",
+    "start:bff-web": "cd bff-web && npm run start",
+    "start:nextjs-mobile": "cd nextjs-mobile && npm run dev",
+    "start:nextjs-web": "cd nextjs-web && npm run dev",
+    "start:all": "npm run start:backend-inventory & npm run start:backend-order & npm run start:bff-mobile & npm run start:bff-web & npm run start:nextjs-mobile & npm run start:nextjs-web"
+  },
+  "private": true
+}

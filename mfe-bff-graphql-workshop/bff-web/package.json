@@ -1,0 +1,13 @@
+{
+  "main": "index.js",
+  "scripts": {
+    "start": "micro -l tcp://0.0.0.0:4001"
+  },
+  "dependencies": {
+    "apollo-server-micro": "^3.13.0",
+    "graphql": "^16.8.1",
+    "micro": "^10.0.1",
+    "micro-cors": "^0.1.1",
+    "node-fetch": "^2.6.1"
+  }
+}

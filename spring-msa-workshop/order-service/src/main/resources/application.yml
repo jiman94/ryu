@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: local
+    group:
+      local:
+        - order-local
+        - core-local
+      develop:
+        - order-develop
+        - core-develop
+      test:
+        - order-test
+        - core-test        -
+    include:
+      - order
+      - core
